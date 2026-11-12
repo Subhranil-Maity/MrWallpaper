@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="MrWallpaper.Views.ExplorePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:MrWallpaper.Helpers"
+    xmlns:models="using:MrWallpaper.Models"
+    NavigationCacheMode="Required">
+
+    <Page.Resources>
+        <LinearGradientBrush x:Key="RainbowBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#cc0000" />
+            <GradientStop Offset="0.5" Color="#77cc33" />
+            <GradientStop Offset="1" Color="#0066cc" />
+        </LinearGradientBrush>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <Grid Padding="28,12,28,0" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Explore" />
+                <TextBlock
+                    x:Name="ResultCount"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="Wallpapers from Wallhaven" />
+            </StackPanel>
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                Grid.Column="1"
+                MaxWidth="520"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                PlaceholderText="Search characters, series, tags…"
+                QueryIcon="Find"
+                QuerySubmitted="SearchBox_QuerySubmitted"
+                TextChanged="SearchBox_TextChanged">
+                <AutoSuggestBox.KeyboardAccelerators>
+                    <KeyboardAccelerator
+                        Key="F"
+                        Invoked="FocusSearch_Invoked"
+                        Modifiers="Control" />
+                </AutoSuggestBox.KeyboardAccelerators>
+            </AutoSuggestBox>
+            <Button
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Click="Refresh_Click"
+                AutomationProperties.Name="Refresh (F5)"
+                ToolTipService.ToolTip="Refresh (F5)">
+                <FontIcon FontSize="14" Glyph="&#xE72C;" />
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F5" />
+                </Button.KeyboardAccelerators>
+            </Button>
+        </Grid>
+
+        <!--  Filters  -->
+        <!--  Wraps onto more rows when the window is narrow  -->
+        <helpers:WrapPanel
+            Grid.Row="1"
+            Margin="28,12,28,8"
+            Spacing="8">
+                <ComboBox
+                    x:Name="SortBox"
+                    MinWidth="150"
+                    SelectionChanged="Filter_Changed"
+                    AutomationProperties.Name="Sort by"
+                    ToolTipService.ToolTip="Sort by">
+                    <ComboBoxItem Content="Top" Tag="toplist" />
+                    <ComboBoxItem Content="Hot" Tag="hot" />
+                    <ComboBoxItem Content="Latest" Tag="date_added" />
+                    <ComboBoxItem Content="Most viewed" Tag="views" />
+                    <ComboBoxItem Content="Most favorited" Tag="favorites" />
+                    <ComboBoxItem Content="Random" Tag="random" />
+                    <ComboBoxItem Content="Best match" Tag="relevance" />
+                </ComboBox>
+                <ComboBox
+                    x:Name="RangeBox"
+                    MinWidth="130"
+                    SelectionChanged="Filter_Changed"
+                    AutomationProperties.Name="Time range"
+                    ToolTipService.ToolTip="Time range">
+                    <ComboBoxItem Content="Today" Tag="1d" />
+                    <ComboBoxItem Content="3 days" Tag="3d" />
+                    <ComboBoxItem Content="This week" Tag="1w" />
+                    <ComboBoxItem Content="This month" Tag="1M" />
+                    <ComboBoxItem Content="3 months" Tag="3M" />
+                    <ComboBoxItem Content="6 months" Tag="6M" />
+                    <ComboBoxItem Content="This year" Tag="1y" />
+                </ComboBox>
+
+                <AppBarSeparator />
+
+                <ToggleButton
+                    x:Name="AnimeToggle"
+                    Click="Filter_Changed"
+                    Content="Anime" />
+                <ToggleButton
+                    x:Name="GeneralToggle"
+                    Click="Filter_Changed"
+                    Content="General" />
+                <ToggleButton
+                    x:Name="PeopleToggle"
+                    Click="Filter_Changed"
+                    Content="People" />
+
+                <AppBarSeparator />
+
+                <ToggleButton
+                    x:Name="SfwToggle"
+                    Click="Filter_Changed"
+                    Content="SFW" />
+                <ToggleButton
+                    x:Name="SketchyToggle"
+                    Click="Filter_Changed"
+                    Content="Sketchy" />
+                <ToggleButton
+                    x:Name="NsfwToggle"
+                    Click="Filter_Changed"
+                    Content="NSFW"
+                    AutomationProperties.Name="Needs a Wallhaven API key (Settings)"
+                    ToolTipService.ToolTip="Needs a Wallhaven API key (Settings)" />
+
+                <AppBarSeparator />
+
+                <ComboBox
+                    x:Name="SizeBox"
+                    MinWidth="160"
+                    SelectionChanged="Filter_Changed"
+                    AutomationProperties.Name="Minimum resolution"
+                    ToolTipService.ToolTip="Minimum resolution">
+                    <ComboBoxItem Content="Any size" />
+                    <ComboBoxItem x:Name="FitScreensItem" Content="Fits my displays" />
+                    <ComboBoxItem Content="1080p or larger" Tag="1920x1080" />
+                    <ComboBoxItem Content="1440p or larger" Tag="2560x1440" />
+                    <ComboBoxItem Content="4K or larger" Tag="3840x2160" />
+                </ComboBox>
+                <ComboBox
+                    x:Name="RatioBox"
+                    MinWidth="150"
+                    SelectionChanged="Filter_Changed"
+                    AutomationProperties.Name="Shape"
+                    ToolTipService.ToolTip="Shape">
+                    <ComboBoxItem Content="Any shape" />
+                    <ComboBoxItem Content="Landscape" Tag="landscape" />
+                    <ComboBoxItem Content="Portrait" Tag="portrait" />
+                    <ComboBoxItem Content="16:9" Tag="16x9" />
+                    <ComboBoxItem Content="16:10" Tag="16x10" />
+                    <ComboBoxItem Content="Ultrawide" Tag="21x9,32x9,48x9" />
+                    <ComboBoxItem Content="4:3" Tag="4x3" />
+                </ComboBox>
+
+                <DropDownButton x:Name="ColorButton" AutomationProperties.Name="Main color" ToolTipService.ToolTip="Main color">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border
+                            x:Name="ColorSwatch"
+                            Width="16"
+                            Height="16"
+                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            Background="{StaticResource RainbowBrush}"
+                            CornerRadius="8" />
+                        <TextBlock x:Name="ColorLabel" Text="Any color" />
+                    </StackPanel>
+                    <DropDownButton.Flyout>
+                        <Flyout x:Name="ColorFlyout" Placement="Bottom">
+                            <StackPanel Width="252" Spacing="12">
+                                <GridView
+                                    x:Name="ColorGrid"
+                                    IsItemClickEnabled="True"
+                                    ItemClick="ColorGrid_ItemClick"
+                                    SelectionMode="None">
+                                    <GridView.ItemTemplate>
+                                        <DataTemplate x:DataType="helpers:PaletteColor">
+                                            <Border
+                                                Width="28"
+                                                Height="28"
+                                                Background="{x:Bind Brush}"
+                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="14"
+                                                ToolTipService.ToolTip="{x:Bind Label}" />
+                                        </DataTemplate>
+                                    </GridView.ItemTemplate>
+                                </GridView>
+                                <Button
+                                    HorizontalAlignment="Stretch"
+                                    Click="ClearColor_Click"
+                                    Content="Any color" />
+                            </StackPanel>
+                        </Flyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </helpers:WrapPanel>
+
+        <!--  Results  -->
+        <Grid Grid.Row="2">
+            <GridView
+                x:Name="Results"
+                Padding="24,4,24,24"
+                IsItemClickEnabled="True"
+                ItemClick="Results_ItemClick"
+                ItemContainerStyle="{StaticResource TileContainerStyle}"
+                SelectionMode="None"
+                SizeChanged="Results_SizeChanged">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid
+                            ItemHeight="190"
+                            ItemWidth="308"
+                            Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="models:WhWallpaper">
+                        <Grid
+                            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            ContextRequested="Tile_ContextRequested"
+                            CornerRadius="8">
+                            <Image Source="{x:Bind helpers:Bind.Thumb(Thumbs.Large)}" Stretch="UniformToFill" />
+                            <Grid
+                                Padding="10,28,10,8"
+                                VerticalAlignment="Bottom"
+                                Background="{StaticResource TileShadeBrush}">
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="White"
+                                    Text="{x:Bind helpers:Bind.Resolution(DimensionX, DimensionY)}" />
+                                <StackPanel
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal"
+                                    Spacing="4">
+                                    <FontIcon
+                                        FontSize="11"
+                                        Foreground="White"
+                                        Glyph="&#xEB52;" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="White"
+                                        Text="{x:Bind helpers:Bind.Count(Favorites)}" />
+                                </StackPanel>
+                            </Grid>
+                            <Border
+                                x:Name="SavedBadge"
+                                Margin="8"
+                                Padding="5"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                CornerRadius="12"
+                                AutomationProperties.Name="In your library"
+                                ToolTipService.ToolTip="In your library"
+                                Visibility="{x:Bind helpers:Bind.InLibrary(Id)}">
+                                <FontIcon
+                                    FontSize="11"
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    Glyph="&#xE73E;" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+
+            <ProgressRing
+                x:Name="FirstLoadRing"
+                Width="48"
+                Height="48"
+                IsActive="False" />
+
+            <StackPanel
+                x:Name="MessagePanel"
+                MaxWidth="420"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12"
+                Visibility="Collapsed">
+                <FontIcon
+                    x:Name="MessageIcon"
+                    FontSize="40"
+                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                    Glyph="&#xE721;" />
+                <TextBlock
+                    x:Name="MessageTitle"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Nothing found" />
+                <TextBlock
+                    x:Name="MessageText"
+                    HorizontalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+                <Button
+                    x:Name="RetryButton"
+                    HorizontalAlignment="Center"
+                    Click="Retry_Click"
+                    Content="Try again"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </StackPanel>
+
+            <ProgressBar
+                x:Name="MoreBar"
+                VerticalAlignment="Bottom"
+                IsIndeterminate="True"
+                Visibility="Collapsed" />
+        </Grid>
+    </Grid>
+</Page>

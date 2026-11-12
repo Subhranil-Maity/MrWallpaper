@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="MrWallpaper.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="MrWallpaper">
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TitleBar
+            x:Name="AppTitleBar"
+            Title="MrWallpaper"
+            BackRequested="AppTitleBar_BackRequested"
+            IsBackButtonVisible="True"
+            IsPaneToggleButtonVisible="True"
+            PaneToggleRequested="AppTitleBar_PaneToggleRequested">
+            <TitleBar.IconSource>
+                <ImageIconSource ImageSource="ms-appx:///Assets/AppIcon.ico" />
+            </TitleBar.IconSource>
+        </TitleBar>
+
+        <NavigationView
+            x:Name="Nav"
+            Grid.Row="1"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="True"
+            ItemInvoked="Nav_ItemInvoked"
+            OpenPaneLength="240"
+            PaneDisplayMode="Auto">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Explore" Tag="explore">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE774;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Library" Tag="library">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8B9;" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.InfoBadge>
+                        <InfoBadge x:Name="LibraryBadge" Visibility="Collapsed" />
+                    </NavigationViewItem.InfoBadge>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Displays" Tag="displays">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7F4;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <Grid>
+                <Frame x:Name="ContentFrame" Navigated="ContentFrame_Navigated" />
+
+                <InfoBar
+                    x:Name="Toast"
+                    MaxWidth="560"
+                    Margin="24,8,24,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Background="{ThemeResource SolidBackgroundFillColorTertiaryBrush}"
+                    IsOpen="False" />
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Window>

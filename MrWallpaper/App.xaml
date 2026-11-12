@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application
+    x:Class="MrWallpaper.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--  Rounded "card" surface used for settings rows and info panels (Windows 11 style)  -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+
+            <!--  Grid tiles: no selection chrome, content fills the cell  -->
+            <Style x:Key="TileContainerStyle" TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="CornerRadius" Value="8" />
+            </Style>
+
+            <LinearGradientBrush x:Key="TileShadeBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="#00000000" />
+                <GradientStop Offset="1" Color="#B0000000" />
+            </LinearGradientBrush>
+
+            <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+                <Setter Property="Margin" Value="1,16,0,6" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

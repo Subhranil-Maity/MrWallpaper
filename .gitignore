@@ -1,0 +1,7 @@
+# Build outputs (can be rebuilt; kept on disk, not in git)
+[Bb]in/
+[Oo]bj/
+/Release/
+HelloWinUI/generated/
+.vs/
+*.user

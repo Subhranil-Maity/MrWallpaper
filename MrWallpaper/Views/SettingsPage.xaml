@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="MrWallpaper.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel
+            MaxWidth="1000"
+            Padding="28,12,28,28"
+            Spacing="4">
+            <TextBlock
+                Margin="0,0,0,8"
+                Style="{StaticResource TitleTextBlockStyle}"
+                Text="Settings" />
+
+            <!--  Appearance  -->
+            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Appearance" />
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE790;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="App theme" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Choose light, dark, or match Windows" />
+                    </StackPanel>
+                    <ComboBox
+                        x:Name="ThemeBox"
+                        Grid.Column="2"
+                        MinWidth="180"
+                        VerticalAlignment="Center"
+                        SelectionChanged="ThemeBox_SelectionChanged">
+                        <ComboBoxItem Content="Use system setting" />
+                        <ComboBoxItem Content="Light" />
+                        <ComboBoxItem Content="Dark" />
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <!--  Wallhaven  -->
+            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Wallhaven" />
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16" RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE8D7;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="API key (optional)" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Only needed to browse NSFW wallpapers. Browsing everything else works without one."
+                            TextWrapping="Wrap" />
+                        <HyperlinkButton
+                            Margin="-12,0,0,0"
+                            Click="GetKey_Click"
+                            Content="Get your API key" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <PasswordBox
+                            x:Name="ApiKeyBox"
+                            Width="260"
+                            PasswordChanged="ApiKeyBox_PasswordChanged"
+                            PlaceholderText="Paste your key" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  Library  -->
+            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Library" />
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE8B7;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Download folder" />
+                        <TextBlock
+                            x:Name="FolderText"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            IsTextSelectionEnabled="True"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Button Click="ChangeFolder_Click" Content="Change…" />
+                        <Button Click="OpenFolder_Click" AutomationProperties.Name="Open folder" ToolTipService.ToolTip="Open folder">
+                            <FontIcon FontSize="14" Glyph="&#xE838;" />
+                        </Button>
+                        <Button
+                            x:Name="ResetFolderButton"
+                            Click="ResetFolder_Click"
+                            AutomationProperties.Name="Back to Pictures\MrWallpaper"
+                            ToolTipService.ToolTip="Back to Pictures\MrWallpaper">
+                            <FontIcon FontSize="14" Glyph="&#xE777;" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  About  -->
+            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="About" />
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Image
+                            Width="32"
+                            Height="32"
+                            Source="ms-appx:///Assets/AppIcon.ico" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="MrWallpaper" />
+                            <TextBlock
+                                x:Name="VersionText"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextWrapping="Wrap">
+                        <Run Text="MrWallpaper only runs while its window is open. Closing it ends the app completely, with no background process, tray icon or startup entry. Your wallpapers stay set because Windows keeps them." />
+                    </TextBlock>
+                    <TextBlock
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextWrapping="Wrap">
+                        <Run Text="Wallpapers come from " /><Hyperlink NavigateUri="https://wallhaven.cc">wallhaven.cc</Hyperlink><Run Text=". Artwork belongs to its creators." />
+                    </TextBlock>
+                    <HyperlinkButton
+                        Margin="-12,0,0,0"
+                        Click="OpenDataFolder_Click"
+                        Content="Open settings folder" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
