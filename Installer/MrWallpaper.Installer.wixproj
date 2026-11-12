@@ -1,0 +1,18 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputName>MrWallpaper-Setup</OutputName>
+    <Platform>x64</Platform>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <!-- Folder produced by `dotnet publish` of the app (see build-installer.ps1). -->
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\publish\</PublishDir>
+    <DefineConstants>PublishDir=$(PublishDir);IconPath=$(MSBuildThisFileDirectory)..\MrWallpaper\Assets\AppIcon.ico</DefineConstants>
+    <!--
+      ICE38/64/91: per-user installs keep files under the user profile, which these checks flag even though it's correct.
+      ICE03: some Windows App SDK DLLs list many languages in their version info; it's metadata only.
+    -->
+    <SuppressIces>ICE03;ICE38;ICE64;ICE91</SuppressIces>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>
