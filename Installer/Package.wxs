@@ -6,7 +6,7 @@
   -->
   <Package Name="MrWallpaper"
            Manufacturer="MrWallpaper"
-           Version="1.0.0.0"
+           Version="1.1.0.0"
            UpgradeCode="DDF23ADC-1CA3-45E0-8166-F2DDBB98C20B"
            Scope="perUser"
            Compressed="yes">
