@@ -13,7 +13,6 @@
   <img src="https://img.shields.io/badge/UI-WinUI%203-6E4BDB" alt="WinUI 3">
   <img src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white" alt=".NET 10">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT"></a>
-  <a href="https://github.com/Subhranil-Maity/MrWallpaper/actions/workflows/ci.yml"><img src="https://github.com/Subhranil-Maity/MrWallpaper/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <a href="https://github.com/Subhranil-Maity/MrWallpaper/releases/latest"><img src="https://img.shields.io/github/v/release/Subhranil-Maity/MrWallpaper" alt="Latest release"></a>
 </p>
 

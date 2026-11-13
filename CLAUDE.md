@@ -92,7 +92,7 @@ The app has no MVVM framework and no dependency injection. Pages are XAML with c
 - WiX 5 SDK project. Per-user install to `%LocalAppData%\Programs\MrWallpaper` (no admin), using the `WixUI_Minimal` wizard with `License.rtf` as the terms page. It adds a Start menu shortcut and an optional "Launch" checkbox on the finish page.
 - It packages everything in `artifacts\publish` via `<Files Include="$(PublishDir)**" />`.
 - **Never change `UpgradeCode`.** When releasing, bump `Version` in both `Installer/Package.wxs` and `MrWallpaper/MrWallpaper.csproj`, so `MajorUpgrade` replaces the old install.
-- **Releasing:** add `.github/release-notes/vX.Y.Z.md`, then push a `vX.Y.Z` tag. `.github/workflows/release.yml` checks the tag matches both versions, runs `build-installer.ps1` and publishes a GitHub release with `MrWallpaper-Setup.msi` (the asset name must stay the same; the README links to `releases/latest/download/MrWallpaper-Setup.msi`). `ci.yml` runs the same build on pushes to `main` and on PRs.
+- **Releasing:** add `.github/release-notes/vX.Y.Z.md`, then push a `vX.Y.Z` tag. `.github/workflows/release.yml` checks the tag matches both versions, runs `build-installer.ps1` and publishes a GitHub release with `MrWallpaper-Setup.msi` (the asset name must stay the same; the README links to `releases/latest/download/MrWallpaper-Setup.msi`). `ci.yml` runs the same build, but only when started manually (Actions → CI → Run workflow); the owner doesn't want a run on every push.
 - The suppressed ICEs (03/38/64/91) are expected for a per-user install that contains Windows App SDK DLLs. Don't add `ARPNOMODIFY`, because `WixUI_Minimal` already defines it.
 
 ## Repo notes

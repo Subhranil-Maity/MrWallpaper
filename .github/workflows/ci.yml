@@ -1,13 +1,8 @@
-# Builds the app and the MSI on every push to main and every pull request.
+# Manual-only: builds the app and the MSI when started from Actions -> CI -> Run workflow.
 # The installer step runs the trimmed Release publish, which is where trimming/AOT problems show up.
 name: CI
 
 on:
-  push:
-    branches: [main]
-    paths-ignore: ['**.md', 'docs/**', 'LICENSE']
-  pull_request:
-    paths-ignore: ['**.md', 'docs/**', 'LICENSE']
   workflow_dispatch:
 
 concurrency:
