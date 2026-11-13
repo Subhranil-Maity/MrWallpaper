@@ -31,11 +31,11 @@ public static class WallhavenClient
             "q=" + Uri.EscapeDataString(q.Text.Trim()),
             "categories=" + q.CategoriesParam,
             "purity=" + q.PurityParam,
-            "sorting=" + q.Sorting,
+            "sorting=" + q.SortingParam,
             "order=desc",
             "page=" + page,
         };
-        if (q.Sorting == "toplist") args.Add("topRange=" + q.TopRange);
+        if (q.SortingParam == "toplist") args.Add("topRange=" + q.TopRange);
         if (!string.IsNullOrEmpty(q.AtLeast)) args.Add("atleast=" + q.AtLeast);
         if (!string.IsNullOrEmpty(q.Ratios)) args.Add("ratios=" + q.Ratios);
         if (!string.IsNullOrEmpty(q.Color)) args.Add("colors=" + q.Color.TrimStart('#'));

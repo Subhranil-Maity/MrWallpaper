@@ -93,13 +93,14 @@
                     SelectionChanged="Filter_Changed"
                     AutomationProperties.Name="Time range"
                     ToolTipService.ToolTip="Time range">
-                    <ComboBoxItem Content="Today" Tag="1d" />
-                    <ComboBoxItem Content="3 days" Tag="3d" />
-                    <ComboBoxItem Content="This week" Tag="1w" />
-                    <ComboBoxItem Content="This month" Tag="1M" />
-                    <ComboBoxItem Content="3 months" Tag="3M" />
-                    <ComboBoxItem Content="6 months" Tag="6M" />
-                    <ComboBoxItem Content="This year" Tag="1y" />
+                    <ComboBoxItem Content="Past day" Tag="1d" />
+                    <ComboBoxItem Content="Past 3 days" Tag="3d" />
+                    <ComboBoxItem Content="Past week" Tag="1w" />
+                    <ComboBoxItem Content="Past month" Tag="1M" />
+                    <ComboBoxItem Content="Past 3 months" Tag="3M" />
+                    <ComboBoxItem Content="Past 6 months" Tag="6M" />
+                    <ComboBoxItem Content="Past year" Tag="1y" />
+                    <ComboBoxItem Content="All time" Tag="all" />
                 </ComboBox>
 
                 <AppBarSeparator />

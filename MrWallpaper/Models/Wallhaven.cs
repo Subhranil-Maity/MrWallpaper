@@ -87,6 +87,12 @@ public sealed record SearchQuery
     public string? Ratios { get; init; }
     public string? Color { get; init; }
 
+    /// <summary>
+    /// Wallhaven's toplist only goes back one year (topRange max is 1y). The toplist ranks by
+    /// favorites, so "Top · All time" is the same as sorting by favorites with no range.
+    /// </summary>
+    public string SortingParam => Sorting == "toplist" && TopRange == "all" ? "favorites" : Sorting;
+
     public string CategoriesParam => $"{B(General)}{B(Anime)}{B(People)}";
     public string PurityParam => $"{B(Sfw)}{B(Sketchy)}{B(Nsfw)}";
     private static char B(bool v) => v ? '1' : '0';

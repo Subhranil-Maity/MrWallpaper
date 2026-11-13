@@ -17,6 +17,7 @@
         <TitleBar
             x:Name="AppTitleBar"
             Title="MrWallpaper"
+            Height="48"
             BackRequested="AppTitleBar_BackRequested"
             IsBackButtonVisible="True"
             IsPaneToggleButtonVisible="True"
