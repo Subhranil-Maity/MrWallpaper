@@ -21,6 +21,7 @@ public sealed partial class ExplorePage : Page
     public ExplorePage()
     {
         InitializeComponent();
+        TileHover.Attach(Results);
         ColorGrid.ItemsSource = Palette.Items;
         UpdateFitScreens();
         ApplyQueryToControls(new SearchQuery()); // every launch starts from the defaults: Top, past month, anime, SFW

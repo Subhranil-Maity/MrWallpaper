@@ -17,6 +17,7 @@ public sealed partial class LibraryPage : Page
     public LibraryPage()
     {
         InitializeComponent();
+        TileHover.Attach(Items);
         ColorGrid.ItemsSource = Palette.Items;
         SetColor(null);
         LibraryService.Changed += (_, _) =>

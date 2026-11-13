@@ -13,6 +13,8 @@ public sealed partial class SettingsPage : Page
     {
         InitializeComponent();
         ThemeBox.SelectedIndex = SettingsService.Current.Theme;
+        HoverToggle.IsOn = SettingsService.Current.TileHoverEffect;
+        SpacePreviewToggle.IsOn = SettingsService.Current.HoldSpacePreview;
         ApiKeyBox.Password = SettingsService.Current.ApiKey ?? "";
         VersionText.Text = "Version " + (typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.0");
         UpdateFolder();
@@ -37,6 +39,20 @@ public sealed partial class SettingsPage : Page
         SettingsService.Current.Theme = ThemeBox.SelectedIndex;
         SettingsService.Save();
         App.MainWindow?.ApplyTheme();
+    }
+
+    private void HoverToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        SettingsService.Current.TileHoverEffect = HoverToggle.IsOn;
+        SettingsService.Save();
+    }
+
+    private void SpacePreviewToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        SettingsService.Current.HoldSpacePreview = SpacePreviewToggle.IsOn;
+        SettingsService.Save();
     }
 
     private void ApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)

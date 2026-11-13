@@ -70,5 +70,60 @@
                     IsOpen="False" />
             </Grid>
         </NavigationView>
+
+        <!--  Hold-Space preview: covers the whole window while Space is held over a tile  -->
+        <Grid
+            x:Name="PreviewOverlay"
+            Grid.RowSpan="2"
+            Background="#F0101010"
+            PointerPressed="PreviewOverlay_PointerPressed"
+            Visibility="Collapsed">
+            <Grid
+                x:Name="PreviewBox"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <Image
+                    x:Name="PreviewLow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Stretch="Fill" />
+                <Image
+                    x:Name="PreviewHigh"
+                    ImageFailed="PreviewHigh_ImageFailed"
+                    ImageOpened="PreviewHigh_ImageOpened"
+                    Stretch="Uniform" />
+            </Grid>
+            <Border
+                x:Name="PreviewStatus"
+                Margin="0,0,0,32"
+                Padding="14,8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Background="#CC202020"
+                BorderBrush="#33FFFFFF"
+                BorderThickness="1"
+                CornerRadius="16">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <ProgressRing
+                        x:Name="PreviewRing"
+                        Width="16"
+                        Height="16"
+                        Foreground="White"
+                        IsIndeterminate="True" />
+                    <FontIcon
+                        x:Name="PreviewErrorIcon"
+                        FontSize="14"
+                        Foreground="#FFFFB900"
+                        Glyph="&#xE7BA;"
+                        Visibility="Collapsed" />
+                    <TextBlock
+                        x:Name="PreviewStatusText"
+                        VerticalAlignment="Center"
+                        AutomationProperties.LiveSetting="Polite"
+                        FontSize="13"
+                        Foreground="White" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

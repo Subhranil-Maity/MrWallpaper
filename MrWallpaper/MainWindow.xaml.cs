@@ -2,12 +2,18 @@ using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using MrWallpaper.Helpers;
+using MrWallpaper.Models;
 using MrWallpaper.Services;
 using MrWallpaper.Views;
 using Windows.Graphics;
+using VirtualKey = Windows.System.VirtualKey;
 
 namespace MrWallpaper;
 
@@ -33,6 +39,10 @@ public sealed partial class MainWindow : Window
 
         AppWindow.Closing += (_, _) => SavePlacement();
         RootGrid.Loaded += RootGrid_Loaded;
+        RootGrid.PreviewKeyDown += RootGrid_PreviewKeyDown;
+        RootGrid.PreviewKeyUp += RootGrid_PreviewKeyUp;
+        // A key release that happens in another window never reaches us, so close the preview when we lose focus.
+        Activated += (_, e) => { if (e.WindowActivationState == WindowActivationState.Deactivated) ClosePreview(); };
         LibraryService.Changed += (_, _) => UpdateLibraryBadge();
     }
 
@@ -109,6 +119,151 @@ public sealed partial class MainWindow : Window
         _toastTimer.Stop();
         _toastTimer.Interval = TimeSpan.FromSeconds(severity == InfoBarSeverity.Error ? 8 : 3.5);
         _toastTimer.Start();
+    }
+
+    // ------------------------------------------------------------- Hold-Space preview
+
+    private CancellationTokenSource? _previewCts;
+    private bool _spaceHeld; // Space went down for the preview; swallow its key-up too
+
+    private void RootGrid_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (PreviewOverlay.Visibility == Visibility.Visible)
+        {
+            if (e.Key == VirtualKey.Escape) ClosePreview();
+            e.Handled = true; // includes Space's key repeat
+            return;
+        }
+        if (e.Key != VirtualKey.Space || !SettingsService.Current.HoldSpacePreview || TileHover.HoveredItem is not { } item) return;
+        // Space keeps typing in text boxes, such as the Explore search box.
+        if (FocusManager.GetFocusedElement(RootGrid.XamlRoot) is TextBox or PasswordBox or RichEditBox) return;
+
+        e.Handled = true; // otherwise Space would also open the focused tile
+        _spaceHeld = true;
+        OpenPreview(item);
+    }
+
+    private void RootGrid_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Space || !_spaceHeld) return;
+        e.Handled = true;
+        ClosePreview();
+    }
+
+    private void PreviewOverlay_PointerPressed(object sender, PointerRoutedEventArgs e) => ClosePreview();
+
+    private async void OpenPreview(object item)
+    {
+        int width, height;
+        string? localPath;
+        WhWallpaper? remote = null;
+        if (item is WhWallpaper w)
+        {
+            remote = w;
+            (width, height) = (w.DimensionX, w.DimensionY);
+            localPath = LibraryService.Find(w.Id)?.FilePath;
+        }
+        else if (item is LibraryItem l)
+        {
+            (width, height) = (l.Width, l.Height);
+            localPath = l.FilePath;
+        }
+        else return;
+
+        _previewCts?.Cancel();
+        var cts = _previewCts = new CancellationTokenSource();
+
+        // Fit the picture into the window, never larger than its real size.
+        double areaW = Math.Max(1, RootGrid.ActualWidth - 48), areaH = Math.Max(1, RootGrid.ActualHeight - 48);
+        double scale = RootGrid.XamlRoot.RasterizationScale;
+        double boxW = areaW, boxH = areaH;
+        if (width > 0 && height > 0)
+        {
+            double fit = Math.Min(Math.Min(areaW / width, areaH / height), 1 / scale);
+            (boxW, boxH) = (width * fit, height * fit);
+        }
+        PreviewBox.Width = boxW;
+        PreviewBox.Height = boxH;
+
+        // Low quality first: the tile's thumbnail, which is already cached.
+        if (remote is not null)
+        {
+            // Wallhaven's large thumbnails are a centred 16:9 crop, so place it over the part of the picture it shows.
+            const double thumbRatio = 16.0 / 9;
+            bool wider = width > 0 && height > 0 && (double)width / height > thumbRatio;
+            PreviewLow.Width = wider ? boxH * thumbRatio : boxW;
+            PreviewLow.Height = wider ? boxH : boxW / thumbRatio;
+            PreviewLow.Source = Bind.Thumb(remote.Thumbs.Large);
+        }
+        else
+        {
+            PreviewLow.Width = boxW;
+            PreviewLow.Height = boxH;
+            PreviewLow.Source = Bind.LocalThumb(localPath);
+        }
+        PreviewLow.Visibility = Visibility.Visible;
+        AutomationProperties.SetName(PreviewHigh, item.ToString());
+
+        var high = new BitmapImage();
+        int target = (int)Math.Round(boxW * scale);
+        if (width > target) high.DecodePixelWidth = target; // decode at screen size, not at 6K
+        PreviewHigh.Source = high;
+
+        SetPreviewStatus("Low-quality preview · Loading full quality…", loading: true);
+        PreviewOverlay.Visibility = Visibility.Visible;
+
+        if (localPath is not null)
+        {
+            high.UriSource = new Uri(localPath);
+            return;
+        }
+
+        var progress = new Progress<double>(p =>
+        {
+            if (!cts.IsCancellationRequested)
+                SetPreviewStatus($"Low-quality preview · Loading full quality… {p:0%}", loading: true);
+        });
+        try
+        {
+            var path = await CacheService.GetAsync(CacheTier.Full, remote!.Path, progress, cts.Token);
+            if (!cts.IsCancellationRequested) high.UriSource = new Uri(path);
+        }
+        catch (OperationCanceledException) when (cts.IsCancellationRequested) { /* Space released */ }
+        catch
+        {
+            if (!cts.IsCancellationRequested) SetPreviewStatus("Low-quality preview · Couldn't load full quality", loading: false);
+        }
+    }
+
+    private void PreviewHigh_ImageOpened(object sender, RoutedEventArgs e)
+    {
+        PreviewLow.Visibility = Visibility.Collapsed;
+        PreviewStatus.Visibility = Visibility.Collapsed;
+    }
+
+    private void PreviewHigh_ImageFailed(object sender, ExceptionRoutedEventArgs e) =>
+        SetPreviewStatus("Low-quality preview · Couldn't load full quality", loading: false);
+
+    private void SetPreviewStatus(string text, bool loading)
+    {
+        PreviewStatus.Visibility = Visibility.Visible;
+        PreviewStatusText.Text = text;
+        PreviewRing.IsActive = loading;
+        PreviewRing.Visibility = loading ? Visibility.Visible : Visibility.Collapsed;
+        PreviewErrorIcon.Visibility = loading ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void ClosePreview()
+    {
+        _spaceHeld = false;
+        if (PreviewOverlay.Visibility != Visibility.Visible) return;
+        _previewCts?.Cancel(); // stops a download that hasn't finished
+        _previewCts = null;
+        PreviewOverlay.Visibility = Visibility.Collapsed;
+        PreviewRing.IsActive = false;
+        // Free the large bitmap right away.
+        PreviewHigh.Source = null;
+        PreviewLow.Source = null;
     }
 
     // ------------------------------------------------------------- Theme

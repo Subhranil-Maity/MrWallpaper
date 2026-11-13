@@ -7,6 +7,12 @@ public sealed class AppSettings
     public string? ApiKey { get; set; }
     public string? LibraryFolder { get; set; }
 
+    /// <summary>Explore and Library tiles grow slightly while the pointer is over them.</summary>
+    public bool TileHoverEffect { get; set; } = true;
+
+    /// <summary>Holding Space over an Explore or Library tile shows it full screen until Space is released.</summary>
+    public bool HoldSpacePreview { get; set; } = true;
+
     /// <summary>Searches typed in Explore, most recent first.</summary>
     public List<string> SearchHistory { get; set; } = [];
 

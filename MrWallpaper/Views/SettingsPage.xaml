@@ -43,6 +43,57 @@
                     </ComboBox>
                 </Grid>
             </Border>
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE962;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Tiles pop out on hover" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Thumbnails in Explore and Library grow slightly when you point at them"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ToggleSwitch
+                        x:Name="HoverToggle"
+                        Grid.Column="2"
+                        MinWidth="0"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Tiles pop out on hover"
+                        Toggled="HoverToggle_Toggled" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE740;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Hold Space to preview" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Point at a thumbnail in Explore or Library and hold Space to see it full screen. Release Space to close it."
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ToggleSwitch
+                        x:Name="SpacePreviewToggle"
+                        Grid.Column="2"
+                        MinWidth="0"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Hold Space to preview"
+                        Toggled="SpacePreviewToggle_Toggled" />
+                </Grid>
+            </Border>
 
             <!--  Wallhaven  -->
             <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Wallhaven" />
