@@ -26,6 +26,18 @@ public static class WallhavenClient
 
     public static async Task<WhSearchResponse> SearchAsync(SearchQuery q, int page, string? seed, CancellationToken ct)
     {
+        var args = SearchArgs(q) + "&page=" + page;
+        if (!string.IsNullOrEmpty(seed)) args += "&seed=" + seed;
+
+        var json = await GetStringAsync("search?" + args, ct);
+        return JsonSerializer.Deserialize(json, JsonContext.Default.WhSearchResponse) ?? new();
+    }
+
+    /// <summary>Identifies a search for the results cache. An API key can change what a search returns.</summary>
+    public static string SearchKey(SearchQuery q) => SearchArgs(q) + (SettingsService.HasApiKey ? "&key=1" : "");
+
+    private static string SearchArgs(SearchQuery q)
+    {
         var args = new List<string>
         {
             "q=" + Uri.EscapeDataString(q.Text.Trim()),
@@ -33,23 +45,30 @@ public static class WallhavenClient
             "purity=" + q.PurityParam,
             "sorting=" + q.SortingParam,
             "order=desc",
-            "page=" + page,
         };
         if (q.SortingParam == "toplist") args.Add("topRange=" + q.TopRange);
         if (!string.IsNullOrEmpty(q.AtLeast)) args.Add("atleast=" + q.AtLeast);
         if (!string.IsNullOrEmpty(q.Ratios)) args.Add("ratios=" + q.Ratios);
         if (!string.IsNullOrEmpty(q.Color)) args.Add("colors=" + q.Color.TrimStart('#'));
-        if (!string.IsNullOrEmpty(seed)) args.Add("seed=" + seed);
-
-        var json = await GetStringAsync("search?" + string.Join('&', args), ct);
-        return JsonSerializer.Deserialize(json, JsonContext.Default.WhSearchResponse) ?? new();
+        return string.Join('&', args);
     }
 
-    /// <summary>Full info for one wallpaper, including tags and uploader.</summary>
+    /// <summary>Full info for one wallpaper, including tags and uploader. Served from the cache for a week.</summary>
     public static async Task<WhWallpaper?> GetWallpaperAsync(string id, CancellationToken ct)
     {
+        if (CacheService.TryReadDetails(id) is { } cached)
+        {
+            try
+            {
+                if (JsonSerializer.Deserialize(cached, JsonContext.Default.WhDetailResponse)?.Data is { } hit) return hit;
+            }
+            catch (JsonException) { /* damaged cache file: fetch again */ }
+        }
+
         var json = await GetStringAsync("w/" + Uri.EscapeDataString(id), ct);
-        return JsonSerializer.Deserialize(json, JsonContext.Default.WhDetailResponse)?.Data;
+        var data = JsonSerializer.Deserialize(json, JsonContext.Default.WhDetailResponse)?.Data;
+        if (data is not null) CacheService.WriteDetails(id, json);
+        return data;
     }
 
     public static async Task DownloadFileAsync(string url, string destination, IProgress<double>? progress, CancellationToken ct)

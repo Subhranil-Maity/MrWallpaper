@@ -56,19 +56,39 @@ public sealed partial class DetailPage : Page
 
     // ------------------------------------------------------------- Content
 
-    private void LoadPreview()
+    private async void LoadPreview()
     {
         PreviewRing.IsActive = true;
         int width = _local?.Width ?? _remote?.DimensionX ?? 0;
 
+        // The tile's thumbnail is already in the preview cache, so this shows instantly while the full image loads.
         if (_remote is not null)
-            PreviewThumb.Source = new BitmapImage(new Uri(_remote.Thumbs.Original)); // shows instantly while the full image loads
+            PreviewThumb.Source = Bind.CachedPreview(_remote.Thumbs.Large, 0);
 
         var full = new BitmapImage();
         if (width > MaxPreviewPixels) full.DecodePixelWidth = MaxPreviewPixels;
         full.ImageFailed += (_, _) => PreviewRing.IsActive = false;
-        full.UriSource = new Uri(_local is not null ? _local.FilePath : _remote!.Path);
         PreviewFull.Source = full;
+
+        if (_local is not null)
+        {
+            full.UriSource = new Uri(_local.FilePath);
+            return;
+        }
+
+        // Full quality goes through the full-image cache: from disk if it's there, otherwise downloaded into it.
+        var remote = _remote!;
+        var token = _cts.Token;
+        try
+        {
+            var path = await CacheService.GetAsync(CacheTier.Full, remote.Path, null, token);
+            if (!token.IsCancellationRequested) full.UriSource = new Uri(path);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { /* left the page */ }
+        catch
+        {
+            if (!token.IsCancellationRequested) full.UriSource = new Uri(remote.Path); // load straight from the web
+        }
     }
 
     private void PreviewFull_ImageOpened(object sender, RoutedEventArgs e)

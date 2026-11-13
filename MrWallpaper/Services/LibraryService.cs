@@ -46,7 +46,16 @@ public static class LibraryService
             foreach (var item in _items) item.PropertyChanged += (_, _) => Save();
         }
         await SyncWithFolderAsync();
+
+        // Once per run: drop cached tile thumbnails of files that have left the library.
+        if (!_prunedThumbs)
+        {
+            _prunedThumbs = true;
+            CacheService.PruneLibraryThumbs(_items.Select(i => i.FilePath));
+        }
     }
+
+    private static bool _prunedThumbs;
 
     /// <summary>Drops entries whose file is gone and adds images that were copied in by hand.</summary>
     public static async Task SyncWithFolderAsync()
@@ -114,7 +123,10 @@ public static class LibraryService
         var extension = Path.GetExtension(new Uri(wallpaper.Path).AbsolutePath);
         var destination = Path.Combine(folder, $"wallhaven-{wallpaper.Id}{extension}");
 
-        await WallhavenClient.DownloadFileAsync(wallpaper.Path, destination, progress, ct);
+        // Already viewed in full quality? Take it from the cache instead of downloading it again.
+        if (!TryTakeFromCache(wallpaper.Path, destination))
+            await WallhavenClient.DownloadFileAsync(wallpaper.Path, destination, progress, ct);
+        progress?.Report(1);
 
         var item = new LibraryItem
         {
@@ -162,6 +174,19 @@ public static class LibraryService
     {
         await SyncWithFolderAsync();
         Changed?.Invoke(null, EventArgs.Empty);
+    }
+
+    /// <summary>Moves the cached full-quality file into the library, so it isn't stored twice.</summary>
+    private static bool TryTakeFromCache(string url, string destination)
+    {
+        if (CacheService.TryGet(CacheTier.Full, url) is not { } cached) return false;
+        try { File.Move(cached, destination, overwrite: true); return true; }
+        catch
+        {
+            // Still open somewhere (the detail page may be reading it); a copy works then.
+            try { File.Copy(cached, destination, overwrite: true); return true; }
+            catch { return false; }
+        }
     }
 
     private static void RebuildIdSet()

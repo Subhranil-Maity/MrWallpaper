@@ -24,6 +24,7 @@ public partial class App : Application
     {
         MainWindow = new MainWindow();
         MainWindow.Activate();
+        _ = CacheService.CleanUpAsync(); // trims the caches in the background
     }
 
     /// <summary>Shows a short message at the top of the window.</summary>

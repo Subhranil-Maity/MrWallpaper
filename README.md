@@ -66,7 +66,7 @@ MrWallpaper only runs while its window is open. Closing it ends the app complete
 **Feels like part of Windows**
 - Mica background, Windows 11 controls, and light, dark or system theme
 - Works with keyboard and screen readers
-- Remembers the window size and your last filters
+- Remembers the window size, and suggests your past searches (remove any with ✕)
 
 ## Install
 

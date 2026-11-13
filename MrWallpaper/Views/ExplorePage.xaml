@@ -45,8 +45,51 @@
                 VerticalAlignment="Center"
                 PlaceholderText="Search characters, series, tags…"
                 QueryIcon="Find"
+                GotFocus="SearchBox_GotFocus"
+                PreviewKeyDown="SearchBox_PreviewKeyDown"
                 QuerySubmitted="SearchBox_QuerySubmitted"
                 TextChanged="SearchBox_TextChanged">
+                <AutoSuggestBox.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </AutoSuggestBox.ItemContainerStyle>
+                <AutoSuggestBox.ItemTemplate>
+                    <!--  A past search with a button that removes it from the history  -->
+                    <DataTemplate x:DataType="models:SearchHistoryItem">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="&#xE81C;" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Text}"
+                                TextTrimming="CharacterEllipsis" />
+                            <Button
+                                Grid.Column="2"
+                                Width="28"
+                                Height="28"
+                                Margin="0,0,-8,0"
+                                Padding="0"
+                                AutomationProperties.Name="Remove from history"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Click="RemoveHistory_Click"
+                                IsTabStop="False"
+                                ToolTipService.ToolTip="Remove from history (Shift+Delete)">
+                                <FontIcon FontSize="12" Glyph="&#xE711;" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </AutoSuggestBox.ItemTemplate>
                 <AutoSuggestBox.KeyboardAccelerators>
                     <KeyboardAccelerator
                         Key="F"

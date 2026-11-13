@@ -119,6 +119,123 @@
                 </Grid>
             </Border>
 
+            <!--  Storage  -->
+            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Storage" />
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE91B;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Preview cache" />
+                        <TextBlock
+                            x:Name="PreviewUsageText"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Small thumbnails for the Explore grid"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ComboBox
+                        x:Name="PreviewLimitBox"
+                        Grid.Column="2"
+                        MinWidth="160"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Preview cache size"
+                        SelectionChanged="CacheLimit_Changed">
+                        <ComboBoxItem Content="100 MB" Tag="100" />
+                        <ComboBoxItem Content="250 MB" Tag="250" />
+                        <ComboBoxItem Content="500 MB" Tag="500" />
+                        <ComboBoxItem Content="1 GB" Tag="1024" />
+                        <ComboBoxItem Content="Unlimited" Tag="0" />
+                    </ComboBox>
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xEB9F;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Full-quality cache" />
+                        <TextBlock
+                            x:Name="FullUsageText"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Wallpapers you opened, so they show instantly next time"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ComboBox
+                        x:Name="FullLimitBox"
+                        Grid.Column="2"
+                        MinWidth="160"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Full-quality cache size"
+                        SelectionChanged="CacheLimit_Changed">
+                        <ComboBoxItem Content="1 GB" Tag="1024" />
+                        <ComboBoxItem Content="2 GB" Tag="2048" />
+                        <ComboBoxItem Content="5 GB" Tag="5120" />
+                        <ComboBoxItem Content="10 GB" Tag="10240" />
+                        <ComboBoxItem Content="Unlimited" Tag="0" />
+                    </ComboBox>
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE74D;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Clear cache" />
+                        <TextBlock
+                            x:Name="OtherUsageText"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Library thumbnails, wallpaper details and saved searches are cached too. Everything is downloaded again when needed."
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button
+                        x:Name="ClearCacheButton"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Click="ClearCache_Click"
+                        Content="Clear cache" />
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon VerticalAlignment="Center" Glyph="&#xE81C;" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Search history" />
+                        <TextBlock
+                            x:Name="HistoryCountText"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Past searches suggested in the Explore search box"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button
+                        x:Name="ClearHistoryButton"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Click="ClearHistory_Click"
+                        Content="Clear history" />
+                </Grid>
+            </Border>
+
             <!--  About  -->
             <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="About" />
             <Border Style="{StaticResource CardStyle}">

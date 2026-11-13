@@ -10,19 +10,52 @@ namespace MrWallpaper.Helpers;
 /// <summary>Small functions used from x:Bind in XAML.</summary>
 public static class Bind
 {
-    /// <summary>Thumbnail decoded at grid size, so a full screen of tiles stays light on memory.</summary>
-    public static ImageSource? Thumb(string? uri)
+    private const int TileDecodeWidth = 420;
+
+    /// <summary>
+    /// Wallhaven thumbnail decoded at grid size, so a full screen of tiles stays light on memory.
+    /// Served from the preview cache when it's there; otherwise downloaded into it first.
+    /// </summary>
+    public static ImageSource? Thumb(string? url) => CachedPreview(url, TileDecodeWidth);
+
+    /// <summary>A Wallhaven thumbnail through the preview cache. <paramref name="decodeWidth"/> 0 decodes at full size.</summary>
+    public static BitmapImage? CachedPreview(string? url, int decodeWidth)
     {
-        if (string.IsNullOrEmpty(uri)) return null;
-        return new BitmapImage
+        if (string.IsNullOrEmpty(url)) return null;
+        var image = new BitmapImage();
+        if (decodeWidth > 0)
         {
-            DecodePixelWidth = 420,
-            DecodePixelType = DecodePixelType.Logical,
-            UriSource = new Uri(uri),
-        };
+            image.DecodePixelWidth = decodeWidth;
+            image.DecodePixelType = DecodePixelType.Logical;
+        }
+        if (CacheService.TryGet(CacheTier.Previews, url) is { } cached) image.UriSource = new Uri(cached);
+        else _ = LoadPreviewAsync(image, url);
+        return image;
     }
 
-    public static ImageSource? LocalThumb(string? path) => string.IsNullOrEmpty(path) ? null : Thumb(path);
+    private static async Task LoadPreviewAsync(BitmapImage image, string url)
+    {
+        string source;
+        try { source = await CacheService.GetAsync(CacheTier.Previews, url); }
+        catch { source = url; } // the cache is best effort; let the image load straight from the web
+        image.UriSource = new Uri(source);
+    }
+
+    /// <summary>A library image's tile, from a small cached JPEG instead of decoding the full-size file.</summary>
+    public static ImageSource? LocalThumb(string? path)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+        var image = new BitmapImage { DecodePixelWidth = TileDecodeWidth, DecodePixelType = DecodePixelType.Logical };
+        _ = LoadLocalThumbAsync(image, path);
+        return image;
+    }
+
+    private static async Task LoadLocalThumbAsync(BitmapImage image, string path)
+    {
+        string? thumb = null;
+        try { thumb = await CacheService.GetLibraryThumbAsync(path); } catch { }
+        image.UriSource = new Uri(thumb ?? path);
+    }
 
     public static string Resolution(int width, int height) => $"{width} × {height}";
 

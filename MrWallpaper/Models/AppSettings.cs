@@ -7,11 +7,22 @@ public sealed class AppSettings
     public string? ApiKey { get; set; }
     public string? LibraryFolder { get; set; }
 
-    // Last used Explore filters, so the app opens where you left it.
-    public SearchQuery LastQuery { get; set; } = new();
+    /// <summary>Searches typed in Explore, most recent first.</summary>
+    public List<string> SearchHistory { get; set; } = [];
+
+    // Image cache limits in MB; 0 = no limit.
+    public int PreviewCacheLimitMb { get; set; } = 500;
+    public int FullCacheLimitMb { get; set; } = 2048;
 
     // Window placement
     public int WindowWidth { get; set; }
     public int WindowHeight { get; set; }
     public bool WindowMaximized { get; set; }
+}
+
+/// <summary>One entry in the Explore search box's history list.</summary>
+public sealed record SearchHistoryItem(string Text)
+{
+    /// <summary>What screen readers announce for the suggestion.</summary>
+    public override string ToString() => Text;
 }
