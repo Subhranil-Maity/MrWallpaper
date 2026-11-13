@@ -1,0 +1,53 @@
+# Pushing a tag like v1.2.0 builds the MSI and publishes it as a GitHub release.
+# Release notes come from .github/release-notes/<tag>.md (falls back to auto-generated notes).
+# The tag must match <Version> in MrWallpaper.csproj and Installer/Package.wxs.
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check tag matches project versions
+        run: |
+          $tag = '${{ github.ref_name }}'
+          $version = $tag.TrimStart('v')
+          [xml]$csproj = Get-Content MrWallpaper/MrWallpaper.csproj
+          $appVersion = ($csproj.Project.PropertyGroup.Version | Where-Object { $_ }) | Select-Object -First 1
+          [xml]$wxs = Get-Content Installer/Package.wxs
+          $msiVersion = $wxs.Wix.Package.Version
+          "Tag: $version  csproj: $appVersion  Package.wxs: $msiVersion"
+          if ($appVersion -ne $version) { throw "MrWallpaper.csproj Version ($appVersion) doesn't match tag $tag" }
+          if ($msiVersion -ne "$version.0" -and $msiVersion -ne $version) { throw "Package.wxs Version ($msiVersion) doesn't match tag $tag" }
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish and build installer (Release, x64)
+        run: ./build-installer.ps1
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ github.ref_name }}'
+          $msi = 'artifacts/installer/MrWallpaper-Setup.msi'
+          $hash = (Get-FileHash $msi -Algorithm SHA256).Hash.ToLowerInvariant()
+          $notesFile = ".github/release-notes/$tag.md"
+          $notes = if (Test-Path $notesFile) { Get-Content $notesFile -Raw } else { '' }
+          $notes += "`n`n---`n`n**SHA-256** ``MrWallpaper-Setup.msi``: ``$hash```n"
+          $out = Join-Path $env:RUNNER_TEMP 'notes.md'
+          Set-Content $out $notes -Encoding utf8NoBOM
+          $ghArgs = @($tag, $msi, '--title', "MrWallpaper $($tag.TrimStart('v'))", '--notes-file', $out, '--verify-tag')
+          if (-not (Test-Path $notesFile)) { $ghArgs += '--generate-notes' }
+          gh release create @ghArgs
+          if ($LASTEXITCODE) { throw 'gh release create failed' }

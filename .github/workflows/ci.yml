@@ -1,0 +1,49 @@
+# Builds the app and the MSI on every push to main and every pull request.
+# The installer step runs the trimmed Release publish, which is where trimming/AOT problems show up.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE']
+  pull_request:
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.wixproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build (Debug, x64)
+        run: dotnet build MrWallpaper/MrWallpaper.csproj -c Debug -p:Platform=x64
+
+      - name: Publish and build installer (Release, x64)
+        run: ./build-installer.ps1
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: MrWallpaper-Setup-${{ github.sha }}
+          path: artifacts/installer/MrWallpaper-Setup.msi
+          if-no-files-found: error
+          retention-days: 14

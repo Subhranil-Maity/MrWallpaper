@@ -13,6 +13,8 @@
   <img src="https://img.shields.io/badge/UI-WinUI%203-6E4BDB" alt="WinUI 3">
   <img src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white" alt=".NET 10">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT"></a>
+  <a href="https://github.com/Subhranil-Maity/MrWallpaper/actions/workflows/ci.yml"><img src="https://github.com/Subhranil-Maity/MrWallpaper/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/Subhranil-Maity/MrWallpaper/releases/latest"><img src="https://img.shields.io/github/v/release/Subhranil-Maity/MrWallpaper" alt="Latest release"></a>
 </p>
 
 <p align="center">
@@ -70,7 +72,7 @@ MrWallpaper only runs while its window is open. Closing it ends the app complete
 
 ## Install
 
-Run `MrWallpaper-Setup.msi`.
+Download **[MrWallpaper-Setup.msi](https://github.com/Subhranil-Maity/MrWallpaper/releases/latest/download/MrWallpaper-Setup.msi)** from the [latest release](https://github.com/Subhranil-Maity/MrWallpaper/releases/latest) and run it.
 
 - It installs just for your user account, in `%LocalAppData%\Programs\MrWallpaper`, so it doesn't need administrator rights.
 - It adds a Start menu shortcut and an uninstall entry in **Settings → Apps**.
