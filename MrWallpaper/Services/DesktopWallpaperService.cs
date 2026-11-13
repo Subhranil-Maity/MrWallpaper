@@ -72,7 +72,7 @@ public static partial class DesktopWallpaperService
         }
     }
 
-    /// <summary>Active monitors, numbered the way Windows numbers them in Settings ▸ Display.</summary>
+    /// <summary>Active monitors, numbered left to right (then top to bottom) by desktop position.</summary>
     public static List<MonitorInfo> GetMonitors()
     {
         var names = GetFriendlyNames();
